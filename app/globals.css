@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #101114;
+  --ink-soft: #1c1e22;
+  --paper: #f2f0ea;
+  --paper-dim: #e7e4db;
+  --line: #dcd8cd;
+  --muted: #6c6e70;
+  --signal: #3654ff;
+  --signal-dim: #2540d1;
+  --flare: #f2542d;
+  --success: #1c8a5b;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paper: var(--paper);
+  --color-paper-dim: var(--paper-dim);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-signal: var(--signal);
+  --color-signal-dim: var(--signal-dim);
+  --color-flare: var(--flare);
+  --color-success: var(--success);
+  --font-display: "Reelcraft Display", Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  --font-sans: "Reelcraft Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--signal);
+  color: white;
+}
+
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+/* ---------- procedural gradient palette used for avatars/portfolio/thumbnails ---------- */
+.gradient-1 { background: linear-gradient(135deg, #3654ff 0%, #101114 100%); }
+.gradient-2 { background: linear-gradient(135deg, #f2542d 0%, #1c1e22 100%); }
+.gradient-3 { background: linear-gradient(135deg, #1c8a5b 0%, #101114 100%); }
+.gradient-4 { background: linear-gradient(135deg, #8b5cf6 0%, #101114 100%); }
+.gradient-5 { background: linear-gradient(135deg, #f2542d 0%, #3654ff 100%); }
+.gradient-6 { background: linear-gradient(135deg, #0ea5b7 0%, #101114 100%); }
+.gradient-7 { background: linear-gradient(135deg, #d4af37 0%, #1c1e22 100%); }
+.gradient-8 { background: linear-gradient(135deg, #3654ff 0%, #0ea5b7 100%); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 32s linear infinite; }
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(1.5deg); }
+}
+.animate-float-slow { animation: float-slow 7s ease-in-out infinite; }
+
+@keyframes float-slower {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(10px) rotate(-1deg); }
+}
+.animate-float-slower { animation: float-slower 9s ease-in-out infinite; }
+
+@keyframes dialog-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.dialog-fade { animation: dialog-fade-in 0.15s ease-out; }
+
+@keyframes dialog-pop-in { from { opacity: 0; transform: translate(-50%, -48%) scale(0.97); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+.dialog-pop { animation: dialog-pop-in 0.16s ease-out; }
+
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.animate-toast-in { animation: toast-in 0.18s ease-out; }
