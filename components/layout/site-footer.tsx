@@ -22,10 +22,10 @@ const columns = [
   {
     title: "Company",
     links: [
-      { href: "/", label: "About" },
-      { href: "/", label: "Careers" },
-      { href: "/", label: "Trust & Safety" },
-      { href: "/", label: "Contact" },
+      { href: "/about", label: "About" },
+      { href: "/careers", label: "Careers" },
+      { href: "/trust-safety", label: "Trust & Safety" },
+      { href: "/contact", label: "Contact" },
     ],
   },
 ];
