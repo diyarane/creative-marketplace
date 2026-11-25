@@ -3,10 +3,13 @@ import fs from "fs";
 import path from "path";
 import {
   SPECIALIZATION_PORTFOLIO_IMAGES,
+  CATEGORY_HERO_IMAGES,
+  getCategoryHeroImage,
   normalizeSpecialization,
   getSpecializationPortfolioImages,
   resolvePortfolioItemImage,
   getCreatorCardImages,
+  getImagePresentation,
 } from "@/lib/portfolio-images";
 
 describe("portfolio images mapping", () => {
@@ -32,6 +35,43 @@ describe("portfolio images mapping", () => {
         expect(img.endsWith(".png")).toBe(true);
       }
     }
+  });
+
+  it("maps categories correctly according to exact requirements", () => {
+    expect(getCategoryHeroImage("Motion Designer")).toBe("/pics/motiondesigner1.png");
+    expect(getCategoryHeroImage("3D Artist")).toBe("/pics/3dartist1.png");
+    expect(getCategoryHeroImage("VFX Artist")).toBe("/pics/vfx1.png");
+    expect(getCategoryHeroImage("Video Editor")).toBe("/pics/videoeditor1.png");
+    expect(getCategoryHeroImage("Character Animator")).toBe("/pics/characteranimator1.png");
+    expect(getCategoryHeroImage("Product Animator")).toBe("/pics/productanimator1.png");
+    expect(getCategoryHeroImage("CGI Artist")).toBe("/pics/cgiartist1.png");
+    expect(getCategoryHeroImage("Compositor")).toBe("/pics/compositor1.png");
+
+    for (const spec of specializations) {
+      const hero = CATEGORY_HERO_IMAGES[spec];
+      const localPath = path.join(process.cwd(), "public", hero.replace(/^\//, ""));
+      expect(fs.existsSync(localPath), `Hero ${hero} must exist`).toBe(true);
+    }
+  });
+
+  it("provides appropriate fitting and presentation rules for all 24 images", () => {
+    for (const images of Object.values(SPECIALIZATION_PORTFOLIO_IMAGES)) {
+      for (const img of images) {
+        const pres = getImagePresentation(img);
+        expect(pres).toBeDefined();
+        expect(["cover", "contain"]).toContain(pres.fit);
+        expect(typeof pres.position).toBe("string");
+        expect(typeof pres.useAmbientBackdrop).toBe("boolean");
+      }
+    }
+
+    // Character animator images require contain + ambient backdrop
+    expect(getImagePresentation("/pics/characteranimator1.png").fit).toBe("contain");
+    expect(getImagePresentation("/pics/characteranimator1.png").useAmbientBackdrop).toBe(true);
+
+    // Product animator images require contain + ambient backdrop
+    expect(getImagePresentation("/pics/productanimator1.png").fit).toBe("contain");
+    expect(getImagePresentation("/pics/productanimator1.png").useAmbientBackdrop).toBe(true);
   });
 
   it("all 24 referenced image files exist in public/pics/", () => {

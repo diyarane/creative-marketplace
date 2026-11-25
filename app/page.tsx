@@ -9,14 +9,13 @@ import { CreatorCard } from "@/components/explore/creator-card";
 import { Button } from "@/components/ui/button";
 import { SPECIALIZATIONS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { resolvePortfolioItemImage } from "@/lib/portfolio-images";
+import {
+  resolvePortfolioItemImage,
+  getCategoryHeroImage,
+  getImagePresentation,
+} from "@/lib/portfolio-images";
 
 export const dynamic = "force-dynamic";
-
-const CATEGORY_ART: Record<string, string> = {
-  "Motion Designer": "gradient-1", "3D Artist": "gradient-6", "VFX Artist": "gradient-2", "Video Editor": "gradient-3",
-  "Character Animator": "gradient-4", "Product Animator": "gradient-8", "CGI Artist": "gradient-7", "Compositor": "gradient-5",
-};
 
 const STEPS = [
   { icon: Search, title: "Discover", text: "Browse portfolios and services from vetted specialists." },
@@ -66,16 +65,35 @@ export default async function Home() {
 
       <section className="bg-paper-dim py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Reveal><p className="text-xs font-semibold uppercase tracking-[0.2em] text-flare">Categories</p><h2 className="mt-2 font-display text-4xl font-semibold tracking-tight">Every discipline of visual craft</h2></Reveal>
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-flare">Categories</p>
+            <h2 className="mt-2 font-display text-4xl font-semibold tracking-tight">Every discipline of visual craft</h2>
+          </Reveal>
           <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
-            {SPECIALIZATIONS.map((s, i) => (
-              <Reveal key={s} delay={i * 0.04}>
-                <Link href={`/explore?specialization=${encodeURIComponent(s)}`} className="group relative block aspect-[4/3] overflow-hidden rounded-2xl">
-                  <div className={cn(CATEGORY_ART[s], "absolute inset-0 transition-transform duration-500 group-hover:scale-110")} />
-                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-4"><span className="font-display text-lg font-semibold text-white">{s}</span></div>
-                </Link>
-              </Reveal>
-            ))}
+            {SPECIALIZATIONS.map((s, i) => {
+              const imageSrc = getCategoryHeroImage(s);
+              return (
+                <Reveal key={s} delay={i * 0.04}>
+                  <Link
+                    href={`/explore?specialization=${encodeURIComponent(s)}`}
+                    className="group relative block aspect-[4/3] overflow-hidden rounded-2xl bg-ink-soft border border-ink/10"
+                  >
+                    <img
+                      src={imageSrc}
+                      alt={s}
+                      loading="lazy"
+                      decoding="async"
+                      className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/80 via-black/30 to-transparent p-4 transition-opacity group-hover:from-black/90">
+                      <span className="font-display text-lg font-semibold text-white tracking-tight">
+                        {s}
+                      </span>
+                    </div>
+                  </Link>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -98,25 +116,52 @@ export default async function Home() {
 
       <section className="bg-ink py-24 text-paper">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Reveal><p className="text-xs font-semibold uppercase tracking-[0.2em] text-flare">Featured work</p><h2 className="mt-2 font-display text-4xl font-semibold tracking-tight">Fresh from the studio</h2></Reveal>
+          <Reveal>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-flare">Featured work</p>
+            <h2 className="mt-2 font-display text-4xl font-semibold tracking-tight">Fresh from the studio</h2>
+          </Reveal>
           <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3">
-            {work.map((w, i) => (
-              <Reveal key={w.id} delay={i * 0.05}>
-                <Link href={`/creator/${w.creatorId}`} className="group block">
-                  <div className="relative aspect-video overflow-hidden rounded-xl bg-ink-soft">
-                    <img
-                      src={resolvePortfolioItemImage(w, w.creator.specialization, i)}
-                      alt={w.title}
-                      loading="lazy"
-                      decoding="async"
-                      className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <p className="mt-3 text-sm font-medium">{w.title}</p>
-                  <p className="text-xs text-paper/50">by {w.creator.user.name}</p>
-                </Link>
-              </Reveal>
-            ))}
+            {work.map((w, i) => {
+              const imgSrc = resolvePortfolioItemImage(w, w.creator.specialization, i);
+              const pres = getImagePresentation(imgSrc);
+              return (
+                <Reveal key={w.id} delay={i * 0.05}>
+                  <Link href={`/creator/${w.creatorId}`} className="group block">
+                    <div className="relative aspect-video overflow-hidden rounded-xl bg-[#14151a] border border-white/10 transition-colors group-hover:border-white/20">
+                      {pres.useAmbientBackdrop ? (
+                        <>
+                          <img
+                            src={imgSrc}
+                            alt=""
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-0 size-full scale-125 object-cover opacity-35 blur-xl"
+                          />
+                          <div className="pointer-events-none absolute inset-0 bg-ink/30" />
+                          <img
+                            src={imgSrc}
+                            alt={w.title}
+                            loading="lazy"
+                            decoding="async"
+                            className="relative z-10 size-full object-contain p-1 transition-transform duration-500 group-hover:scale-105"
+                          />
+                        </>
+                      ) : (
+                        <img
+                          src={imgSrc}
+                          alt={w.title}
+                          loading="lazy"
+                          decoding="async"
+                          style={{ objectPosition: pres.position }}
+                          className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      )}
+                    </div>
+                    <p className="mt-3 text-sm font-medium">{w.title}</p>
+                    <p className="text-xs text-paper/50">by {w.creator.user.name}</p>
+                  </Link>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>

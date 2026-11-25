@@ -13,6 +13,7 @@ import type { PortfolioItemDTO } from "@/types";
 import {
   resolvePortfolioItemImage,
   getSpecializationPortfolioImages,
+  getImagePresentation,
 } from "@/lib/portfolio-images";
 
 interface PortfolioGridProps {
@@ -89,38 +90,59 @@ export function PortfolioGrid({ items, specialization }: PortfolioGridProps) {
 
       <Dialog open={!!active} onOpenChange={(open) => !open && setActive(null)}>
         <DialogContent className="max-w-2xl overflow-hidden p-0">
-          {active && (
-            <>
-              <div className="relative flex aspect-video items-center justify-center overflow-hidden bg-black">
-                <img
-                  src={resolvePortfolioItemImage(
-                    active,
-                    specialization || active.category
+          {active && (() => {
+            const activeImgUrl = resolvePortfolioItemImage(
+              active,
+              specialization || active.category
+            );
+            const pres = getImagePresentation(activeImgUrl);
+            return (
+              <>
+                <div className="relative flex aspect-video items-center justify-center overflow-hidden bg-black">
+                  {pres.useAmbientBackdrop ? (
+                    <>
+                      <img
+                        src={activeImgUrl}
+                        alt=""
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 size-full scale-125 object-cover opacity-35 blur-xl"
+                      />
+                      <img
+                        src={activeImgUrl}
+                        alt={active.title}
+                        className="relative z-10 max-h-full max-w-full object-contain p-2"
+                      />
+                    </>
+                  ) : (
+                    <img
+                      src={activeImgUrl}
+                      alt={active.title}
+                      style={{ objectPosition: pres.position }}
+                      className="size-full object-cover"
+                    />
                   )}
-                  alt={active.title}
-                  className="size-full object-cover"
-                />
-                {active.mediaType === "VIDEO" && (
-                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/25">
-                    <div className="flex size-16 items-center justify-center rounded-full bg-white/20 backdrop-blur transition-transform group-hover:scale-110">
-                      <Play className="size-7 fill-white text-white" />
+                  {active.mediaType === "VIDEO" && (
+                    <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/25">
+                      <div className="flex size-16 items-center justify-center rounded-full bg-white/20 backdrop-blur transition-transform group-hover:scale-110">
+                        <Play className="size-7 fill-white text-white" />
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-              <div className="p-6">
-                <DialogTitle className="font-display text-xl font-semibold text-ink">
-                  {active.title}
-                </DialogTitle>
-                <div className="mt-2">
-                  <Badge variant="signal">{active.category}</Badge>
+                  )}
                 </div>
-                <DialogDescription className="mt-3 text-sm leading-relaxed text-ink/75">
-                  {active.description}
-                </DialogDescription>
-              </div>
-            </>
-          )}
+                <div className="p-6">
+                  <DialogTitle className="font-display text-xl font-semibold text-ink">
+                    {active.title}
+                  </DialogTitle>
+                  <div className="mt-2">
+                    <Badge variant="signal">{active.category}</Badge>
+                  </div>
+                  <DialogDescription className="mt-3 text-sm leading-relaxed text-ink/75">
+                    {active.description}
+                  </DialogDescription>
+                </div>
+              </>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </>

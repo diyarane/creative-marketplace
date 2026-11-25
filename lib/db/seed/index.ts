@@ -206,24 +206,29 @@ async function main() {
   const gradients = ["gradient-1", "gradient-2", "gradient-3", "gradient-4", "gradient-5", "gradient-6", "gradient-7", "gradient-8"];
 
   let gi = 0;
-  for (const { profile, ...rest } of creators.map((c) => ({ profile: c.profile, spec: c.profile.specialization }))) {
-    const titles = portfolioTitles[rest.spec] || ["Featured Work", "Client Project", "Personal Study"];
-    const specImages = getSpecializationPortfolioImages(rest.spec);
+  for (let creatorIdx = 0; creatorIdx < creators.length; creatorIdx++) {
+    const profile = creators[creatorIdx].profile;
+    const spec = profile.specialization;
+    const titles = portfolioTitles[spec] || ["Featured Work", "Client Project", "Personal Study"];
+    const specImages = getSpecializationPortfolioImages(spec);
     let itemIdx = 0;
     for (const title of titles) {
       const gradient = gradients[gi % gradients.length];
       const imagePath = specImages[itemIdx % specImages.length];
       gi++;
+      // Stagger createdAt so the primary item (item 0) for each creator is newest by creatorIdx
+      const createdAt = new Date(Date.now() - (itemIdx * 24 + creatorIdx) * 3600000);
       itemIdx++;
       await db.insert(portfolioItems).values({
         creatorId: profile.id,
         title,
-        description: `${title} — a ${rest.spec.toLowerCase()} project exploring rhythm, contrast, and clean motion.`,
-        category: rest.spec,
+        description: `${title} — a ${spec.toLowerCase()} project exploring rhythm, contrast, and clean motion.`,
+        category: spec,
         mediaType: gi % 3 === 0 ? "VIDEO" : "IMAGE",
         mediaUrl: imagePath,
         thumbnailUrl: imagePath,
         gradient,
+        createdAt,
       });
     }
   }
