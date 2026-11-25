@@ -14,6 +14,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { useToast } from "@/components/ui/toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { resolvePortfolioItemImage } from "@/lib/portfolio-images";
 
 export default function PortfolioManagerPage() {
   const { profile, loading, reload } = useOwnProfile();
@@ -82,9 +83,17 @@ export default function PortfolioManagerPage() {
         {loading && <Skeleton className="h-60 rounded-2xl" />}
         {profile && profile.portfolioItems.length === 0 && <EmptyState icon={ImageIcon} title="No portfolio items" description="Add your first piece of work." />}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          {profile?.portfolioItems.map((item) => (
+          {profile?.portfolioItems.map((item, i) => (
             <div key={item.id} className="group overflow-hidden rounded-xl border border-ink/10 bg-white">
-              <div className={cn(item.gradient, "aspect-[4/3]")} />
+              <div className="relative aspect-[4/3] overflow-hidden bg-ink/5">
+                <img
+                  src={resolvePortfolioItemImage(item, profile.specialization, i)}
+                  alt={item.title}
+                  loading="lazy"
+                  decoding="async"
+                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
               <div className="flex items-center justify-between p-3">
                 <div className="min-w-0"><p className="truncate text-sm font-medium text-ink">{item.title}</p><p className="text-xs text-muted">{item.mediaType === "VIDEO" ? "Video" : "Image"}</p></div>
                 <button onClick={() => remove(item.id)} aria-label={`Remove ${item.title}`} className="rounded-full p-1.5 text-muted hover:bg-red-50 hover:text-red-600"><Trash2 className="size-4" /></button>

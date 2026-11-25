@@ -1,23 +1,40 @@
 import Link from "next/link";
-import { Star, MapPin, Clock } from "lucide-react";
+import { Star, MapPin } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { CreatorProfileDTO } from "@/types";
-import { cn } from "@/lib/utils";
+import { getCreatorCardImages } from "@/lib/portfolio-images";
 
-export function CreatorCard({ creator }: { creator: CreatorProfileDTO & { portfolioItems?: { gradient: string }[] } }) {
-  const items = creator.portfolioItems?.slice(0, 3) || [];
+export function CreatorCard({
+  creator,
+}: {
+  creator: CreatorProfileDTO & {
+    portfolioItems?: {
+      thumbnailUrl?: string | null;
+      mediaUrl?: string | null;
+      gradient?: string | null;
+    }[];
+  };
+}) {
+  const images = getCreatorCardImages(creator);
+
   return (
     <Link
       href={`/creator/${creator.id}`}
       className="group block overflow-hidden rounded-2xl border border-ink/10 bg-white transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-ink/5"
     >
       <div className="grid grid-cols-3 gap-0.5 bg-ink/5 p-0.5">
-        {(items.length ? items : [{ gradient: creator.coverGradient }, { gradient: creator.coverGradient }, { gradient: creator.coverGradient }]).map(
-          (item, i) => (
-            <div key={i} className={cn(item.gradient, "aspect-square transition-transform duration-500 group-hover:scale-105")} />
-          )
-        )}
+        {images.map((src, i) => (
+          <div key={i} className="relative aspect-square overflow-hidden bg-ink/10">
+            <img
+              src={src}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          </div>
+        ))}
       </div>
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">

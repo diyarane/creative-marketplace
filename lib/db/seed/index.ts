@@ -18,6 +18,7 @@ import {
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { computePlatformFee } from "@/lib/services/payments";
+import { getSpecializationPortfolioImages } from "@/lib/portfolio-images";
 
 const DAY = 24 * 60 * 60 * 1000;
 const daysAgo = (n: number) => new Date(Date.now() - n * DAY);
@@ -207,17 +208,21 @@ async function main() {
   let gi = 0;
   for (const { profile, ...rest } of creators.map((c) => ({ profile: c.profile, spec: c.profile.specialization }))) {
     const titles = portfolioTitles[rest.spec] || ["Featured Work", "Client Project", "Personal Study"];
+    const specImages = getSpecializationPortfolioImages(rest.spec);
+    let itemIdx = 0;
     for (const title of titles) {
       const gradient = gradients[gi % gradients.length];
+      const imagePath = specImages[itemIdx % specImages.length];
       gi++;
+      itemIdx++;
       await db.insert(portfolioItems).values({
         creatorId: profile.id,
         title,
         description: `${title} — a ${rest.spec.toLowerCase()} project exploring rhythm, contrast, and clean motion.`,
         category: rest.spec,
         mediaType: gi % 3 === 0 ? "VIDEO" : "IMAGE",
-        mediaUrl: `/media/${gradient}`,
-        thumbnailUrl: `/media/${gradient}`,
+        mediaUrl: imagePath,
+        thumbnailUrl: imagePath,
         gradient,
       });
     }

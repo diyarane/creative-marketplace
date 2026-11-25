@@ -79,7 +79,7 @@ export default async function CreatorProfilePage({ params }: { params: Promise<{
           <section>
             <h2 className="font-display text-xl font-semibold text-ink">Portfolio</h2>
             <div className="mt-4">
-              <PortfolioGrid items={creator.portfolioItems} />
+              <PortfolioGrid items={creator.portfolioItems} specialization={creator.specialization} />
             </div>
           </section>
 

@@ -9,6 +9,7 @@ import { CreatorCard } from "@/components/explore/creator-card";
 import { Button } from "@/components/ui/button";
 import { SPECIALIZATIONS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { resolvePortfolioItemImage } from "@/lib/portfolio-images";
 
 export const dynamic = "force-dynamic";
 
@@ -102,7 +103,15 @@ export default async function Home() {
             {work.map((w, i) => (
               <Reveal key={w.id} delay={i * 0.05}>
                 <Link href={`/creator/${w.creatorId}`} className="group block">
-                  <div className="relative aspect-video overflow-hidden rounded-xl"><div className={cn(w.gradient, "absolute inset-0 transition-transform duration-500 group-hover:scale-105")} /></div>
+                  <div className="relative aspect-video overflow-hidden rounded-xl bg-ink-soft">
+                    <img
+                      src={resolvePortfolioItemImage(w, w.creator.specialization, i)}
+                      alt={w.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
                   <p className="mt-3 text-sm font-medium">{w.title}</p>
                   <p className="text-xs text-paper/50">by {w.creator.user.name}</p>
                 </Link>
